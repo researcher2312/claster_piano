@@ -114,15 +114,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  if(MyTKeys[0].p_Data->StateId == TSL_STATEID_DETECT){
-		  detected = 1;
-	  }
-	  else
-		  detected = 0;
 
-	  if(detected){
-		  detected = 1;
-	  }
   }
   /* USER CODE END 3 */
 }
