@@ -111,7 +111,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    noteOnMIDI(2,l);
+    HAL_delay(500);
+    noteOnMIDI(4,l);
+    HAL_delay(1000);
+    noteOffMIDI(2,l);
+    noteOffMIDI(4,l);
+    HAL_delay(1000);
     /* USER CODE BEGIN 3 */
 
 
