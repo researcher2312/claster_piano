@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "MIDITranslate.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -111,13 +111,13 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    noteOnMIDI(2,l);
-    HAL_delay(500);
-    noteOnMIDI(4,l);
-    HAL_delay(1000);
-    noteOffMIDI(2,l);
-    noteOffMIDI(4,l);
-    HAL_delay(1000);
+    noteOnMIDI(2, 'l', &huart2);
+    HAL_Delay(500);
+    noteOnMIDI(4, 'l', &huart2);
+    HAL_Delay(1000);
+    noteOffMIDI(2, 'l', &huart2);
+    noteOffMIDI(4, 'l', &huart2);
+    HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
 
 
