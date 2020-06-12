@@ -24,7 +24,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include "touch-piano.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,7 +51,7 @@ TSC_HandleTypeDef htsc;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-int detected = 0;
+PIANO_HandleTypeDef hpiano;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,7 +67,10 @@ static void MX_TSC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int _write (int file, char* ptr, int len){
+	HAL_UART_Transmit(&huart2 , ptr , len ,50);
+	return  len;
+}
 /* USER CODE END 0 */
 
 /**
@@ -103,7 +107,7 @@ int main(void)
   MX_TSC_Init();
   MX_TOUCHSENSING_Init();
   /* USER CODE BEGIN 2 */
-
+  pianoInit(&hpiano, &huart2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -113,7 +117,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+	  runTouchStateMachine(&hpiano);
 
   }
   /* USER CODE END 3 */
