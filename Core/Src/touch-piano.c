@@ -14,12 +14,12 @@ uint8_t runTouchStateMachine(PIANO_HandleTypeDef *hpiano){
 			if (MyTKeysB[i].p_Data->Change == TSL_STATE_CHANGED){
 				if (MyTKeysB[i].p_Data->StateId == TSL_STATEID_DETECT){
 					hpiano->keys[i] = 1;
-					noteOnMIDI(i+1, 'l', hpiano->huart);
+					noteOnMIDI(i, 'l', hpiano->huart);
 					pressed_key = i;
 				}
 				else if(hpiano->keys[i] == 1){
 					hpiano->keys[i] = 0;
-					noteOffMIDI(i+1, 'l', hpiano->huart);
+					noteOffMIDI(i, 'l', hpiano->huart);
 				}
 			}
 		}
