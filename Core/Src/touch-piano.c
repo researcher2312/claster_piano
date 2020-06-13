@@ -1,4 +1,5 @@
 #include "touch-piano.h"
+#include "MIDITranslate.h"
 
 void runTouchStateMachine(PIANO_HandleTypeDef *hpiano){
 	tsl_user_status_t status = TSL_USER_STATUS_BUSY;
@@ -12,11 +13,13 @@ void runTouchStateMachine(PIANO_HandleTypeDef *hpiano){
 			if (MyTKeysB[i].p_Data->Change == TSL_STATE_CHANGED){
 				if (MyTKeysB[i].p_Data->StateId == TSL_STATEID_DETECT){
 					hpiano->keys[i] = 1;
-					printf("Naciśnięto klawisz %d \n\r", i+1);
+					//printf("Naciśnięto klawisz %d \n\r", i+1);
+					noteOnMIDI(i+1, 'l', hpiano->huart);
 				}
 				else if(hpiano->keys[i] == 1){
 					hpiano->keys[i] = 0;
-					printf("Zwolniono klawisz %d \n\r", i+1);
+					//printf("Zwolniono klawisz %d \n\r", i+1);
+					noteOffMIDI(i+1, 'l', hpiano->huart);
 				}
 			}
 		}
