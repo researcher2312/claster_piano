@@ -12,13 +12,11 @@ typedef struct PIANO_Sequence{
 	UART_HandleTypeDef *huart;
 } PIANO_Sequence;
 
-//void playSequence (uint8_t notes [64], uint32_t delayTime,UART_HandleTypeDef *huart);
-
-//void loopSequence(UART_HandleTypeDef *huart);
-
 void readSequence(PIANO_Sequence *sequence);
+void addToSequence(PIANO_Sequence *sequence, uint8_t note);
 HAL_StatusTypeDef playNoteFromSequence(PIANO_Sequence *sequence);
 void initSequence(PIANO_Sequence *sequence, uint32_t new_timeout, 	UART_HandleTypeDef *new_huart);
-void resetSequence(PIANO_Sequence *sequence);
+void resetNotes(PIANO_Sequence *sequence);
+void resetCounters(PIANO_Sequence *sequence);
 
 #endif

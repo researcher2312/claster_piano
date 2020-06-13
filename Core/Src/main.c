@@ -109,10 +109,9 @@ int main(void)
   MX_TSC_Init();
   MX_TOUCHSENSING_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t isInSequence = 0;
+  uint8_t isInPlay = 0, isInRecord = 0, pressed_key = 0;
   pianoInit(&hpiano, &huart2);
   initSequence(&sequence, 500, &huart2);
-  readSequence(&sequence);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,14 +121,30 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_SET || isInSequence == 1){
-		  isInSequence = 1;
-		  if (playNoteFromSequence(&sequence) == HAL_TIMEOUT && HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_RESET){
-			  isInSequence = 0;
-			  resetSequence(&sequence);
+	  pressed_key = runTouchStateMachine(&hpiano);
+
+	  if (HAL_GPIO_ReadPin(PLAY_GPIO_Port, PLAY_Pin) == GPIO_PIN_SET || isInRecord == 1){
+		  if (isInRecord == 0){
+			  isInRecord = 1;
+			  resetNotes(&sequence);
+		  }
+		  if (pressed_key != 0){
+			  addToSequence(&sequence, pressed_key);
+		  }
+		  if (HAL_GPIO_ReadPin(PLAY_GPIO_Port, PLAY_Pin) == GPIO_PIN_RESET){
+			  isInRecord = 0;
+			  resetCounters(&sequence);
 		  }
 	  }
-	  runTouchStateMachine(&hpiano);
+
+	  else if (HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_SET || isInPlay == 1){
+		  isInPlay = 1;
+		  if (playNoteFromSequence(&sequence) == HAL_TIMEOUT && HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_RESET){
+			  isInPlay = 0;
+			  resetCounters(&sequence);
+		  }
+	  }
+
 
   }
   /* USER CODE END 3 */

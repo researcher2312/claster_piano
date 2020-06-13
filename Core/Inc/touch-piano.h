@@ -9,7 +9,7 @@ typedef struct PIANO_HandleTypeDef{
 } PIANO_HandleTypeDef;
 
 void pianoInit(PIANO_HandleTypeDef *hpiano, UART_HandleTypeDef *new_huart);
-void runTouchStateMachine(PIANO_HandleTypeDef *hpiano);
+uint8_t runTouchStateMachine(PIANO_HandleTypeDef *hpiano);
 
 
 
