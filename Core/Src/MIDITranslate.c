@@ -60,15 +60,14 @@ uint8_t translatePitchToMIDI(int button, char octave){
 void noteOffMIDI(int button, char octave, UART_HandleTypeDef *huart){
 	uint8_t MessageLength=0;
 	uint8_t pitch=translatePitchToMIDI(button, octave);
-	uint8_t DataToSend[4] = {
-	0b11000000, 						
-        0b00100000|(pitch>>3), 								
-        pitch<<5|0b00001011, 
-        0b11111000
+	uint8_t DataToSend[3] = {
+	0b10000000,
+	pitch,
+	0b00000000
 	};
 	MessageLength = sizeof(DataToSend);
 	/*TUTAJ WYSŁANIE WIADOMOŚCI PRZEZ USB*/
-	for (int i=0;i<4;++i){
+	for (int i=0;i<3;++i){
 		HAL_UART_Transmit(huart, &DataToSend[i],MessageLength,1000);
 	}
 }
@@ -90,17 +89,19 @@ void noteOffMIDI(int button, char octave, UART_HandleTypeDef *huart){
 void noteOnMIDI(int button, char octave, UART_HandleTypeDef *huart){
 	uint8_t MessageLength=0;
 	uint8_t pitch=translatePitchToMIDI(button, octave);
-	uint8_t DataToSend[4] = {
-	0b11001000, 						
-        0b00100000|(pitch>>3), 								
-        pitch<<5|0b00001011, 
-        0b11111000
+	uint8_t DataToSend[3] = {
+	0b10010000,
+        //0b00100000|(pitch>>3),
+        //pitch<<5|0b00001011,
+        //0b11111000
+	pitch,
+	//0b00111100,
+	0b1000000
 	};
 	MessageLength = sizeof(DataToSend);
 	/*TUTAJ WYSŁANIE WIADOMOŚCI PRZEZ USB*/
-	for (int i=0;i<4;++i){
+	for (int i=0;i<3;++i){
 			HAL_UART_Transmit(huart, &DataToSend[i],MessageLength,1000);
 	}
 }
-
 
