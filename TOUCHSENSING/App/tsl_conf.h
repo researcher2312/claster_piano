@@ -46,7 +46,7 @@
 /** Total number of banks in application (range=1..255)
 */
 
-#define TSLPRM_TOTAL_BANKS (3)
+#define TSLPRM_TOTAL_BANKS (4)
 
 /** Total number of "Extended" TouchKeys in application (range=0..255)
 */

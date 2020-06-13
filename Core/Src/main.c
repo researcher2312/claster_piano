@@ -24,7 +24,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include "touch-piano.h"
+#include "sequencer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,7 +52,8 @@ TSC_HandleTypeDef htsc;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-int detected = 0;
+PIANO_HandleTypeDef hpiano;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,7 +69,10 @@ static void MX_TSC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int _write (int file, char* ptr, int len){
+	HAL_UART_Transmit(&huart2 , ptr , len ,50);
+	return  len;
+}
 /* USER CODE END 0 */
 
 /**
@@ -76,7 +82,7 @@ static void MX_TSC_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	PIANO_Sequence sequence;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -103,7 +109,10 @@ int main(void)
   MX_TSC_Init();
   MX_TOUCHSENSING_Init();
   /* USER CODE BEGIN 2 */
-
+  uint8_t isInSequence = 0;
+  pianoInit(&hpiano, &huart2);
+  initSequence(&sequence, 500, &huart2);
+  readSequence(&sequence);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -113,7 +122,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+	  if (HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_SET || isInSequence == 1){
+		  isInSequence = 1;
+		  if (playNoteFromSequence(&sequence) == HAL_TIMEOUT && HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_RESET){
+			  isInSequence = 0;
+			  resetSequence(&sequence);
+		  }
+	  }
+	  runTouchStateMachine(&hpiano);
 
   }
   /* USER CODE END 3 */
@@ -328,7 +344,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 38400;
+  huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -375,19 +391,31 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ROT2_3_Pin ROT2_2_Pin ROT2_1_Pin PLAY_Pin 
-                           OCTAVE_UP_Pin ROT1_1_Pin ROT1_2_Pin */
-  GPIO_InitStruct.Pin = ROT2_3_Pin|ROT2_2_Pin|ROT2_1_Pin|PLAY_Pin 
-                          |OCTAVE_UP_Pin|ROT1_1_Pin|ROT1_2_Pin;
+  /*Configure GPIO pins : ROT2_3_Pin ROT2_2_Pin ROT2_1_Pin OCTAVE_UP_Pin 
+                           ROT1_1_Pin ROT1_2_Pin */
+  GPIO_InitStruct.Pin = ROT2_3_Pin|ROT2_2_Pin|ROT2_1_Pin|OCTAVE_UP_Pin 
+                          |ROT1_1_Pin|ROT1_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : REC_Pin OCTAVE_DOWN_Pin */
-  GPIO_InitStruct.Pin = REC_Pin|OCTAVE_DOWN_Pin;
+  /*Configure GPIO pin : PLAY_Pin */
+  GPIO_InitStruct.Pin = PLAY_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(PLAY_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : REC_Pin */
+  GPIO_InitStruct.Pin = REC_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(REC_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : OCTAVE_DOWN_Pin */
+  GPIO_InitStruct.Pin = OCTAVE_DOWN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(OCTAVE_DOWN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : ROT1_3_Pin */
   GPIO_InitStruct.Pin = ROT1_3_Pin;
