@@ -26,6 +26,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "touch-piano.h"
+#include "sequencer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +53,7 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 PIANO_HandleTypeDef hpiano;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,7 +82,7 @@ int _write (int file, char* ptr, int len){
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	PIANO_Sequence sequence;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -107,7 +109,10 @@ int main(void)
   MX_TSC_Init();
   MX_TOUCHSENSING_Init();
   /* USER CODE BEGIN 2 */
+  uint8_t isInSequence = 0;
   pianoInit(&hpiano, &huart2);
+  initSequence(&sequence, 500, &huart2);
+  readSequence(&sequence);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -117,6 +122,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  if (HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_SET || isInSequence == 1){
+		  isInSequence = 1;
+		  if (playNoteFromSequence(&sequence) == HAL_TIMEOUT && HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_RESET){
+			  isInSequence = 0;
+			  resetSequence(&sequence);
+		  }
+	  }
 	  runTouchStateMachine(&hpiano);
 
   }
