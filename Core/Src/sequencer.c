@@ -1,9 +1,9 @@
 #include "sequencer.h"
 #include "MIDITranslate.h"
 
-HAL_StatusTypeDef playNoteFromSequence(PIANO_Sequence *sequence){
+HAL_StatusTypeDef playNoteFromSequence(PIANO_Sequence *sequence, uint32_t timeout){
 	HAL_StatusTypeDef state = HAL_OK;
-	if (HAL_GetTick() > sequence->last_note_time + sequence->timeout){
+	if (HAL_GetTick() > sequence->last_note_time + timeout){
 		sequence->last_note_time = HAL_GetTick();
 		noteOffMIDI(sequence->notes[sequence->previous_note],'l',sequence->huart);
 		noteOnMIDI(sequence->notes[sequence->current_note],'l',sequence->huart);
@@ -17,11 +17,9 @@ HAL_StatusTypeDef playNoteFromSequence(PIANO_Sequence *sequence){
 	return state;
 }
 
-void initSequence(PIANO_Sequence *sequence, uint32_t new_timeout, UART_HandleTypeDef *new_huart){
+void initSequence(PIANO_Sequence *sequence, UART_HandleTypeDef *new_huart){
 	resetCounters(sequence);
 	resetNotes(sequence);
-	sequence->timeout = new_timeout;
-
 	sequence->huart = new_huart;
 }
 
@@ -38,6 +36,6 @@ void resetNotes(PIANO_Sequence *sequence){
 }
 
 void addToSequence(PIANO_Sequence *sequence, uint8_t note){
-	sequence->current_note++;
 	sequence->notes[sequence->current_note] = note;
+	sequence->current_note++;
 }

@@ -73,6 +73,7 @@ int _write (int file, char* ptr, int len){
 	HAL_UART_Transmit(&huart2 , ptr , len ,50);
 	return  len;
 }
+
 /* USER CODE END 0 */
 
 /**
@@ -109,9 +110,12 @@ int main(void)
   MX_TSC_Init();
   MX_TOUCHSENSING_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+  HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
   uint8_t isInPlay = 0, isInRecord = 0, pressed_key = 0;
+  uint32_t seq_time;
   pianoInit(&hpiano, &huart2);
-  initSequence(&sequence, 500, &huart2);
+  initSequence(&sequence, &huart2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -121,6 +125,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  seq_time = 200 + TIM1->CNT * 10;
 	  pressed_key = runTouchStateMachine(&hpiano);
 
 	  if (HAL_GPIO_ReadPin(PLAY_GPIO_Port, PLAY_Pin) == GPIO_PIN_SET || isInRecord == 1){
@@ -139,7 +144,7 @@ int main(void)
 
 	  else if (HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_SET || isInPlay == 1){
 		  isInPlay = 1;
-		  if (playNoteFromSequence(&sequence) == HAL_TIMEOUT && HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_RESET){
+		  if (playNoteFromSequence(&sequence, seq_time) == HAL_TIMEOUT && HAL_GPIO_ReadPin(REC_GPIO_Port, REC_Pin) == GPIO_PIN_RESET){
 			  isInPlay = 0;
 			  resetCounters(&sequence);
 		  }
@@ -218,7 +223,7 @@ static void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 0;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 0;
+  htim1.Init.Period = 94;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -226,11 +231,11 @@ static void MX_TIM1_Init(void)
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC1Filter = 0;
+  sConfig.IC1Filter = 8;
   sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC2Filter = 0;
+  sConfig.IC2Filter = 8;
   if (HAL_TIM_Encoder_Init(&htim1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -267,20 +272,20 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 0;
+  htim4.Init.Prescaler = 94;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim4.Init.Period = 0;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  sConfig.EncoderMode = TIM_ENCODERMODE_TI1;
+  sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC1Filter = 0;
+  sConfig.IC1Filter = 8;
   sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC2Filter = 0;
+  sConfig.IC2Filter = 8;
   if (HAL_TIM_Encoder_Init(&htim4, &sConfig) != HAL_OK)
   {
     Error_Handler();
