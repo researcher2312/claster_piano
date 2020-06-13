@@ -332,7 +332,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 38400;
+  huart2.Init.BaudRate = 115200;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
@@ -379,19 +379,31 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ROT2_3_Pin ROT2_2_Pin ROT2_1_Pin PLAY_Pin 
-                           OCTAVE_UP_Pin ROT1_1_Pin ROT1_2_Pin */
-  GPIO_InitStruct.Pin = ROT2_3_Pin|ROT2_2_Pin|ROT2_1_Pin|PLAY_Pin 
-                          |OCTAVE_UP_Pin|ROT1_1_Pin|ROT1_2_Pin;
+  /*Configure GPIO pins : ROT2_3_Pin ROT2_2_Pin ROT2_1_Pin OCTAVE_UP_Pin 
+                           ROT1_1_Pin ROT1_2_Pin */
+  GPIO_InitStruct.Pin = ROT2_3_Pin|ROT2_2_Pin|ROT2_1_Pin|OCTAVE_UP_Pin 
+                          |ROT1_1_Pin|ROT1_2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : REC_Pin OCTAVE_DOWN_Pin */
-  GPIO_InitStruct.Pin = REC_Pin|OCTAVE_DOWN_Pin;
+  /*Configure GPIO pin : PLAY_Pin */
+  GPIO_InitStruct.Pin = PLAY_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(PLAY_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : REC_Pin */
+  GPIO_InitStruct.Pin = REC_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(REC_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : OCTAVE_DOWN_Pin */
+  GPIO_InitStruct.Pin = OCTAVE_DOWN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(OCTAVE_DOWN_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : ROT1_3_Pin */
   GPIO_InitStruct.Pin = ROT1_3_Pin;
