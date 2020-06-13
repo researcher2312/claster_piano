@@ -110,3 +110,21 @@ void noteOnMIDI(int button, char octave, UART_HandleTypeDef *huart){
 		noteOffMIDI(14, octave, huart);
 }
 
+//Argumentem jest numer kontrolera i wartość
+void controllerValueChangeMIDI(int controller, int value, UART_HandleTypeDef *huart){
+	uint8_t MessageLength=0;
+	uint8_t DataToSend[3] = {
+	0b10110000,
+        //0b00100000|(pitch>>3),
+        //pitch<<5|0b00001011,
+        //0b11111000
+	controller,
+	//0b00111100,
+	value
+	};
+	MessageLength = sizeof(DataToSend);
+	/*TUTAJ WYSŁANIE WIADOMOŚCI PRZEZ USB*/
+	for (int i=0;i<3;++i){
+			HAL_UART_Transmit(huart, &DataToSend[i],MessageLength,1000);
+	}
+}
